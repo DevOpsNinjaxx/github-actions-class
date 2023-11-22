@@ -68,10 +68,10 @@ jobs:
       - name: Get EC2 Instance Public IP by Tag Name
         run: |
           # Fetch the public IP address of the EC2 instance based on its tag name
-          EC2_INSTANCE_IP=$(aws ec2 describe-instances \
-                              --filters "Name=tag:Name,Values=development-instance" \
-                              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                              --output text >> inventory
+          aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=development-instance" \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --output text >> inventory
           cat  inventory
 
       - name: Cache Ansible inventory
@@ -85,7 +85,6 @@ jobs:
         with:
           name: inventory
           path: inventory
-
   copy_code:
     runs-on: ubuntu-latest
     needs: deploy_infrastructure
@@ -126,8 +125,8 @@ jobs:
         uses: easingthemes/ssh-deploy@v2
         with:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE-HOST: ${{ env.HOST }}
-          REMOTE-USER: ubuntu
+          REMOTE_HOST: ${{ env.HOST }}
+          REMOTE_USER: ubuntu
           source: ./
           target: /var/www/html/
 
