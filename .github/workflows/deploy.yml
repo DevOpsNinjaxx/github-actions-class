@@ -1,0 +1,67 @@
+name: Deploy Infrastructure with Terraform
+
+on:
+  workflow_dispatch:
+    inputs:
+      PR_number:
+        description: 'Pull request number'
+        required: true
+
+jobs:
+  deploy_infrastructure:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: infrastructure/web
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Modify instance name with PR number
+        run: |
+          INSTANCE_NAME="development-instance-PR-${{ github.event.inputs.PR_number }}"
+          sed -i "s/Name = \"development-instance\"/Name = \"$INSTANCE_NAME\"/g" main.tf
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Plan infrastructure changes
+        run: terraform plan -out=tfplan
+
+      - name: Apply infrastructure changes
+        run: terraform apply tfplan
+
+  setup_ansible:
+    runs-on: ubuntu-latest
+      
+    teps:
+      - name: Get EC2 Instance Public IP by Tag Name
+        run: |
+          # Fetch the public IP address of the EC2 instance based on its tag name with PR number
+          EC2_INSTANCE_IP=$(aws ec2 describe-instances \
+                              --filters "Name=tag:Name,Values=development-instance-PR-${{ github.event.inputs.PR_number }}" \
+                              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                              --output text)
+
+          # Append the retrieved IP address to the Ansible inventory file
+          echo "development-instance-PR-${{ github.event.inputs.PR_number }} ansible_host=${EC2_INSTANCE_IP}" >> inventory
+          cat  inventory
+
+      - name: Persist Ansible inventory to artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ansible-inventory
+          path: inventory
+
