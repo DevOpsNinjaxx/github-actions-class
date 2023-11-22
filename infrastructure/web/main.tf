@@ -27,10 +27,10 @@ resource "aws_instance" "development-instance" {
   key_name      = "Sonar-key"          # Replace with your key pair name
   user_data = <<-EOF
     #!/bin/bash
-    sudo yum update -y
-    sudo yum install nginx -y
-    sudo service start nginx
-    sudo service enable nginx
+    sudo apt-get update -y
+    sudo apt-get install nginx -y
+    sudo systemctl start nginx
+    sudo systemctl enable nginx
   EOF
 
   tags = {
