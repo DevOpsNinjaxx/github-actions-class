@@ -128,7 +128,7 @@ jobs:
           REMOTE_HOST: ${{ env.HOST }}
           REMOTE_USER: ubuntu
           source: ./
-          target: /var/www/html/
+          target: ~/
 
   configure_server:
     runs-on: ubuntu-latest
