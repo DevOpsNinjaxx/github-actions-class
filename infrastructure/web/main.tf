@@ -25,6 +25,13 @@ resource "aws_instance" "development-instance" {
   ami           = "ami-0e83be366243f524a"  # Replace with your desired AMI ID
   instance_type = "t2.micro"               # Replace with your desired instance type
   key_name      = "Sonar-key"          # Replace with your key pair name
+  user_data = <<-EOF
+    #!/bin/bash
+    sudo yum update -y
+    sudo yum install nginx -y
+    sudo service start nginx
+    sudo service enable nginx
+  EOF
 
   tags = {
     Name = "development-instance"
