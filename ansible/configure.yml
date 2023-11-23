@@ -18,7 +18,7 @@
       become: true
       ansible.builtin.command: "npm install"
       args:
-        chdir: ~/
+        chdir: ~/app
 
     - name: Start Express.js app with PM2
       become: true
@@ -27,8 +27,8 @@
     - name: Set up Nginx reverse proxy
       become: true
       ansible.builtin.template:
-        src: nginx_reverse_proxy.conf.j2  # Template file for Nginx configuration
-        dest: /etc/nginx/sites-available/your_app.conf  # Change this to your desired Nginx config file path
+        src: ./ansible/nginx_reverse_proxy.conf.j2  # Template file for Nginx configuration
+        dest: /etc/nginx/sites-available/nginx_reverse_proxy.conf.j2   # Change this to your desired Nginx config file path
       notify: Restart Nginx
 
   handlers:

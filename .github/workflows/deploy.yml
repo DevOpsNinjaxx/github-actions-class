@@ -132,7 +132,7 @@ jobs:
           REMOTE_HOST: ${{ env.HOST }}
           REMOTE_USER: ubuntu
           source: ./
-          target: ~/
+          target: ~/app
 
   update-nginx-config:
     runs-on: ubuntu-latest
