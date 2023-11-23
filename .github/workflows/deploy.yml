@@ -153,7 +153,7 @@ jobs:
                               --output text)
 
           # Replace the line in the Nginx config file with the fetched IP
-          sed -i "s/server_name your_domain.com;/server_name $EC2_INSTANCE_IP;/g" /path/to/nginx_reverse_proxy.conf.j2  # Replace with your actual file path
+          sed -i "s/server_name your_domain.com;/server_name $EC2_INSTANCE_IP;/g" ./ansible/nginx_reverse_proxy.conf.j2
 
       - name: Save updated Nginx config as artifact
         uses: actions/upload-artifact@v3
