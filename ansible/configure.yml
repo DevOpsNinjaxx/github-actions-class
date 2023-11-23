@@ -1,0 +1,38 @@
+---
+- name: Install PM2 and Configure Nginx Reverse Proxy
+  hosts: web
+
+  tasks:
+    - name: Install Node.js (if not already installed)
+      become: true
+      ansible.builtin.command: "curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs"
+
+    - name: Install PM2 globally
+      become: true
+      ansible.builtin.npm:
+        name: pm2
+        global: yes
+
+
+    - name: Install app dependencies
+      become: true
+      ansible.builtin.command: "npm install"
+      args:
+        chdir: ~/
+
+    - name: Start Express.js app with PM2
+      become: true
+      ansible.builtin.command: "pm2 start ~/index.js --name app"  # Replace 'index.js' with your main app file and 'your_app_name' with your desired name
+
+    - name: Set up Nginx reverse proxy
+      become: true
+      ansible.builtin.template:
+        src: nginx_reverse_proxy.conf.j2  # Template file for Nginx configuration
+        dest: /etc/nginx/sites-available/your_app.conf  # Change this to your desired Nginx config file path
+      notify: Restart Nginx
+
+  handlers:
+    - name: Restart Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
