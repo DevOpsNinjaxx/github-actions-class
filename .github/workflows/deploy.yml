@@ -86,7 +86,7 @@ jobs:
       - name: Persist Ansible inventory to artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: inventory
+          name: configurations
           path: inventory
 
   copy_code:
@@ -162,13 +162,13 @@ jobs:
       - name: Cache Nginx confix update
         uses: actions/cache@v2
         with:
-          path: nginx_reverse_proxy.conf.j2
+          path: configurations
           key: nginx_reverse_proxy.conf.j2-${{ hashFiles('nginx_reverse_proxy.conf.j2') }}
 
       - name: Save updated Nginx config as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: nginx_reverse_proxy.conf.j2
+          name: configurations
           path: nginx_reverse_proxy.conf.j2
       
 
@@ -190,12 +190,12 @@ jobs:
       - name: Attach Ansible Inventory
         uses: actions/download-artifact@v3
         with:
-          name: inventory
+          name: configurations
 
       - name: Attach updated Nginx config
         uses: actions/download-artifact@v3
         with:
-          name: nginx_reverse_proxy.conf.j2
+          name: configurations
 
       - name: Install dependencies
         run: sudo apt-get install ansible tar gzip       
