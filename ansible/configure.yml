@@ -11,12 +11,11 @@
 
     - name: Install necessary packages
       apt:
-        name: "{{ item }}"
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
         state: present
-      with_items:
-        - ca-certificates
-        - curl
-        - gnupg
 
     - name: Create deb repository
       blockinfile:
