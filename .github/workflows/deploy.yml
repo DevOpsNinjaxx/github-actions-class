@@ -71,8 +71,8 @@ jobs:
           aws ec2 describe-instances \
             --filters "Name=tag:Name,Values=development-instance" \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --output text >> inventory
-          cat  inventory
+            --output text >> ./ansible/inventory
+          cat  ./ansible/inventory
 
       - name: Cache Ansible inventory
         uses: actions/cache@v2
@@ -211,6 +211,6 @@ jobs:
             ssh-private-key: ${{ secrets.AWS_PRIVATE_KEY }}
 
       - name: run ansible playbook
-        run: ansible-playbook -i inventory main.yaml      
+        run: ansible-playbook -i inventory configure.yaml      
 
 
