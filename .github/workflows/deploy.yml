@@ -87,7 +87,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: configurations
-          path: inventory
+          path: ./ansible/inventory
 
   copy_code:
     runs-on: ubuntu-latest
@@ -169,7 +169,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: configurations
-          path: nginx_reverse_proxy.conf.j2
+          path: ./ansible/nginx_reverse_proxy.conf.j2
       
 
   configure_server:
@@ -191,11 +191,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: configurations
+          path: ~/ansible
 
       - name: Attach updated Nginx config
         uses: actions/download-artifact@v3
         with:
           name: configurations
+          path: ~/ansible
 
       - name: Install dependencies
         run: sudo apt-get install ansible tar gzip       
@@ -223,6 +225,4 @@ jobs:
       - name: run ansible playbook
         run: |
           cd ansible
-           ansible-playbook -i inventory configure.yml      
-
-
+          ansible-playbook -i inventory configure.yml
