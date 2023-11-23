@@ -162,7 +162,7 @@ jobs:
       - name: Save updated Nginx config as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: updated-nginx-config
+          name: nginx_reverse_proxy.conf.j2
           path: nginx_reverse_proxy.conf.j2
       
 
@@ -189,7 +189,7 @@ jobs:
       - name: Attach updated Nginx config
         uses: actions/download-artifact@v3
         with:
-          name: updated-nginx-config  
+          name: nginx_reverse_proxy.conf.j2
 
       - name: Install dependencies
         run: sudo apt-get install ansible tar gzip       
