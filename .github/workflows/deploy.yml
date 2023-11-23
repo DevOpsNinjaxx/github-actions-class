@@ -220,7 +220,7 @@ jobs:
       - name: get ssh key for ansible
         uses: webfactory/ssh-agent@v0.6.0
         with:
-            ssh-private-key: ${{ secrets.AWS_PRIVATE_KEY }}
+            ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: run ansible playbook
         run: |
