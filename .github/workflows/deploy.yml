@@ -225,4 +225,4 @@ jobs:
       - name: run ansible playbook
         run: |
           cd ansible
-          ansible-playbook -i inventory configure.yml
+          ansible-playbook -i ~/ansible/inventory configure.yml
