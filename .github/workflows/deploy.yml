@@ -174,7 +174,10 @@ jobs:
 
   configure_server:
     runs-on: ubuntu-latest
-    needs: copy_code
+    needs:
+      - copy_code
+      - update-nginx-config
+      - setup_ansible
 
     steps:
       - name: Checkout code

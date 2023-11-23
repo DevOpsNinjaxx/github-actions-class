@@ -4,9 +4,31 @@
   remote_user: ubuntu
 
   tasks:
-    - name: Install Node.js (if not already installed)
-      become: true
-      ansible.builtin.command: "curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs"
+     - name: Download and import the Nodesource GPG key
+      apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+        state: present
+
+    - name: Install necessary packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - ca-certificates
+        - curl
+        - gnupg
+
+    - name: Create deb repository
+      blockinfile:
+        path: /etc/apt/sources.list.d/nodesource.list
+        block: |
+          deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main
+
+    - name: Run Update and Install
+      apt:
+        update_cache: yes
+        name: nodejs=18.18.2
+        state: present
 
     - name: Install PM2 globally
       become: true
