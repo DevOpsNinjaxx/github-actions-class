@@ -5,6 +5,7 @@
 
   tasks:
     - name: Install necessary packages
+      become: yes
       apt:
         name:
           - ca-certificates
