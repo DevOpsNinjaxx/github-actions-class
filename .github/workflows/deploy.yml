@@ -247,6 +247,6 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           REMOTE_HOST: ${{ env.HOST }}
           REMOTE_USER: ubuntu
-          source: ~/ansible/default.conf
+          source: ./ansible/default.conf
           target: /etc/nginx/conf.d/
             
