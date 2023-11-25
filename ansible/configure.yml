@@ -33,9 +33,16 @@
         cd /home/ubuntu/app
         npm install
 
-    - name: Start Express.js app with PM2
+    - name: Check if PM2 is running
       become: true
-      ansible.builtin.command: "pm2 start /home/ubuntu/app/index.js --name app"  # Replace 'index.js' with your main app file and 'your_app_name' with your desired name
+      ansible.builtin.shell: "pm2 status app"
+      register: pm2_status
+      ignore_errors: yes
+
+    - name: Start Express.js app with PM2 if not already running
+      become: true
+      ansible.builtin.command: "pm2 start /home/ubuntu/app/index.js --name app"
+      when: pm2_status.rc != 0
 
   handlers:
     - name: Restart Nginx
