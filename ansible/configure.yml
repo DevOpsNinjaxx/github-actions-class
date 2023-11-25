@@ -45,17 +45,17 @@
       ansible.builtin.command: "pm2 start /home/ubuntu/app/index.js --name app"
       ignore_errors: yes
 
-    - name: Check if NGINX default virtual host exists
-      become: yes
-      ansible.builtin.stat:
-        path: /etc/nginx/sites-enabled/default
-      register: nginx_default_host
+    #- name: Check if NGINX default virtual host exists
+    #  become: yes
+    #  ansible.builtin.stat:
+    #    path: /etc/nginx/sites-enabled/default
+    #  register: nginx_default_host
 
     - name: Disable NGINX Default Virtual Host if it exists
       become: yes
       command:
         cmd: unlink /etc/nginx/sites-enabled/default
-      when: nginx_default_host.stat.exists
+      ignore_errors: yes
 
     - name: Create NGINX Conf File For Express app
       become: yes
