@@ -148,28 +148,28 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
 
-      - name: Get EC2 Instance IP and update Nginx config
-        run: |
-          # Fetch the public IP address of the EC2 instance based on its tag name
-          EC2_INSTANCE_IP=$(aws ec2 describe-instances \
-                              --filters "Name=tag:Name,Values=development-instance" \
-                              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                              --output text)
-
-          # Replace the line in the Nginx config file with the fetched IP
-          sed -i "s/server_name your_domain.com;/server_name $EC2_INSTANCE_IP;/g" ./ansible/nginx_reverse_proxy.conf.j2
+    #  - name: Get EC2 Instance IP and update Nginx config
+    #    run: |
+    #      # Fetch the public IP address of the EC2 instance based on its tag name
+    #      EC2_INSTANCE_IP=$(aws ec2 describe-instances \
+    #                          --filters "Name=tag:Name,Values=development-instance" \
+    #                          --query 'Reservations[*].Instances[*].PublicIpAddress' \
+    #                          --output text)
+#
+    #      # Replace the line in the Nginx config file with the fetched IP
+    #      sed -i "s/server_name your_domain.com;/server_name $EC2_INSTANCE_IP;/g" ./ansible/default.conf
 
       - name: Cache Nginx confix update
         uses: actions/cache@v2
         with:
           path: configurations
-          key: nginx_reverse_proxy.conf.j2-${{ hashFiles('nginx_reverse_proxy.conf.j2') }}
+          key: default.conf-${{ hashFiles('default.conf') }}
 
       - name: Save updated Nginx config as artifact
         uses: actions/upload-artifact@v3
         with:
           name: configurations
-          path: ./ansible/nginx_reverse_proxy.conf.j2
+          path: ./ansible/default.conf
       
 
   configure_server:
@@ -229,3 +229,24 @@ jobs:
         run: |
           cd ansible
           ansible-playbook -i ~/ansible/inventory configure.yml
+
+      - name: Get EC2 Instance IP and save as HOST
+        run: |
+          # Fetch the public IP address of the EC2 instance based on its tag name
+          EC2_INSTANCE_IP=$(aws ec2 describe-instances \
+                              --filters "Name=tag:Name,Values=development-instance" \
+                              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                              --output text)
+
+          # Set the retrieved IP address as the HOST environment variable
+          echo "HOST=${EC2_INSTANCE_IP}" >> $GITHUB_ENV
+
+      - name: setup Nginx reverse proxy
+        uses: easingthemes/ssh-deploy@v2
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ env.HOST }}
+          REMOTE_USER: ubuntu
+          source: ~/ansible/default.conf
+          target: /etc/nginx/conf.d/
+            

@@ -37,13 +37,6 @@
       become: true
       ansible.builtin.command: "pm2 start /home/ubuntu/app/index.js --name app"  # Replace 'index.js' with your main app file and 'your_app_name' with your desired name
 
-    - name: Set up Nginx reverse proxy
-      become: true
-      ansible.builtin.template:
-        src: /home/ubuntu/app/ansible/nginx_reverse_proxy.conf.j2  # Template file for Nginx configuration
-        dest: /etc/nginx/sites-available/nginx_reverse_proxy.conf.j2   # Change this to your desired Nginx config file path
-      notify: Restart Nginx
-
   handlers:
     - name: Restart Nginx
       ansible.builtin.service:
