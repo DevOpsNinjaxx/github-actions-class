@@ -28,20 +28,19 @@
         global: yes
 
 
-    - name: Install app dependencies
-      become: true
-      ansible.builtin.command: "npm install"
-      args:
-        chdir: ~/app
+    - name: Install dependencies
+      shell: |
+        cd /home/ubuntu/app
+        npm install
 
     - name: Start Express.js app with PM2
       become: true
-      ansible.builtin.command: "pm2 start ~/app/index.js --name app"  # Replace 'index.js' with your main app file and 'your_app_name' with your desired name
+      ansible.builtin.command: "pm2 start /home/ubuntu/app/index.js --name app"  # Replace 'index.js' with your main app file and 'your_app_name' with your desired name
 
     - name: Set up Nginx reverse proxy
       become: true
       ansible.builtin.template:
-        src: ~/ansible/nginx_reverse_proxy.conf.j2  # Template file for Nginx configuration
+        src: /home/ubuntu/app/ansible/nginx_reverse_proxy.conf.j2  # Template file for Nginx configuration
         dest: /etc/nginx/sites-available/nginx_reverse_proxy.conf.j2   # Change this to your desired Nginx config file path
       notify: Restart Nginx
 
