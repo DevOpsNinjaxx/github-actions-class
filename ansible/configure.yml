@@ -45,21 +45,49 @@
       when: pm2_status.rc != 0
 
 
-    - name: copy website files
-      become: true
-      copy:
-        src: /home/ubuntu/app/ansible/default.conf
-        dest: /etc/nginx/conf.d/default.conf
-        owner: ubuntu
-        group: ubuntu
+    - name: Check if NGINX default virtual host exists
+      become: yes
+      ansible.builtin.stat:
+        path: /etc/nginx/sites-enabled/default
+      register: nginx_default_host
 
-    #- name: Copy default.conf to Nginx conf.d directory
-    #  become: true
-    #  ansible.builtin.copy:
-    #    src: /home/ubuntu/app/ansible/default.conf
-    #    /home/ubuntu/app/ansible
-    #    dest: /etc/nginx/conf.d/default.conf
-    #  notify: Restart Nginx  
+    - name: Disable NGINX Default Virtual Host if it exists
+      become: yes
+      command:
+        cmd: unlink /etc/nginx/sites-enabled/default
+      when: nginx_default_host.stat.exists
+
+    - name: Create NGINX Conf File For Kibana
+      become: yes
+      file:
+        path: /etc/nginx/sites-available/default.conf
+        state: touch
+
+    - name: Amend NGINX Conf File
+      become: yes
+      blockinfile:
+          path: /etc/nginx/sites-available/default.conf
+          marker: ""
+          block: |
+            server {
+                listen 80;
+                location / {
+                    proxy_pass http://localhost:3000;
+                    proxy_set_header Authorization "";
+                    proxy_read_timeout 90s;
+                }
+            }
+
+    - name: Check if NGINX Reverse Proxy link already exists
+      stat:
+        path: /etc/nginx/sites-enabled/default.conf
+      register: nginx_link_exists
+
+    - name: Link NGINX Reverse Proxy
+      become: yes
+      command: ln -s /etc/nginx/sites-available/default.conf /etc/nginx/sites-enabled/default.conf
+      when: not nginx_link_exists.stat.exists
+
 
   handlers:
     - name: Restart Nginx
