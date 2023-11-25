@@ -57,7 +57,7 @@
         cmd: unlink /etc/nginx/sites-enabled/default
       when: nginx_default_host.stat.exists
 
-    - name: Create NGINX Conf File For Kibana
+    - name: Create NGINX Conf File For Express app
       become: yes
       file:
         path: /etc/nginx/sites-available/default.conf
@@ -87,6 +87,7 @@
       become: yes
       command: ln -s /etc/nginx/sites-available/default.conf /etc/nginx/sites-enabled/default.conf
       when: not nginx_link_exists.stat.exists
+      notify: Restart Nginx
 
 
   handlers:
